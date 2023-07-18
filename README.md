@@ -1,1 +1,1 @@
-# Protein-Ligand Binding Residue prediction using Protein Langauge Models and Graph Neural Networks.
+# Utilizing Protein Language Models combined with Graph Neural Networks for Protein-Ligand Binding Sites detection
