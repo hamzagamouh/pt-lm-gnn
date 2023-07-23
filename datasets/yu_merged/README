@@ -1,0 +1,9 @@
+Taking ATP ligand as an example, its training dataset is a txt file named as follows:
+                  Training\ATP_Training.txt
+and its validation dataset is also a text file named as follows:
+                  Validation\ATP_Validation.txt
+   
+  Among each txt file, each line contains the following six types of information of a sequence:
+  PDBID, Chain, Binding Site Number, Ligand Type, Binding Residues, and Sequence
+  These six types of information are separated by semicolons as follows:
+3C16;A;BS03;ATP;D21 I22 E23 F25 T26 L63 G64;DMMFHKIY...ERNAYLKEHSIETFLI
