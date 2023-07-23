@@ -67,7 +67,7 @@ def get_metric(labels,pred,name):
 ##__________________ Load data and make batches _____________________________________
 
 # Data folder
-data_folder=f"/home/gamouhh/files/yu_gnn"
+data_folder=f"/home/files/yu_gnn"
 EMB_NAME=args.emb_name
 FEAT_SIZES={"onehot":21,
             "bert":1024,
@@ -236,7 +236,7 @@ for LIGAND in LIGANDS:
 
             print(f"{len(GRAPHS)} graphs")
             model = GNN(MODEL_CLASS,LAYERS).cuda()
-            model.load_state_dict(torch.load(f"/home/gamouhh/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{MODEL_CLASS}_{MODEL_ARCHI}_fold{FOLD}_model.pt"))
+            model.load_state_dict(torch.load(f"/home/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{MODEL_CLASS}_{MODEL_ARCHI}_fold{FOLD}_model.pt"))
             model.eval()
             # # Test on test set
             print("Evaluating on test set ...")
@@ -292,9 +292,9 @@ for LIGAND in LIGANDS:
             DF[metric]+=[score]
 
         
-# pd.DataFrame(DF).to_csv(f"/home/gamouhh/files/yu_gnn_results/{LIGAND}_cutoffs_{EMB_NAME}.csv")
-# pd.DataFrame(DF).to_csv(f"/home/gamouhh/files/yu_gnn_results/{LIGAND}_no_graph_{EMB_NAME}.csv")
-pd.DataFrame(DF).to_csv(f"/home/gamouhh/files/yu_gnn_results/cutoffs_{EMB_NAME}.csv")
+# pd.DataFrame(DF).to_csv(f"/home/files/yu_gnn_results/{LIGAND}_cutoffs_{EMB_NAME}.csv")
+# pd.DataFrame(DF).to_csv(f"/home/files/yu_gnn_results/{LIGAND}_no_graph_{EMB_NAME}.csv")
+pd.DataFrame(DF).to_csv(f"/home/files/yu_gnn_results/cutoffs_{EMB_NAME}.csv")
 
 
 

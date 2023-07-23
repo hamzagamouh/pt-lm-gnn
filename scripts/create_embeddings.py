@@ -48,8 +48,8 @@ def create_bert_emb(seq):
 
 
 
-data_folder=f"/home/gamouhh/files/yu_gnn"
-yu_data_folder="/home/gamouhh/files/datasets/yu_merged/"
+data_folder=f"/home/files/yu_gnn"
+yu_data_folder="/home/files/datasets/yu_merged/"
 
 
 

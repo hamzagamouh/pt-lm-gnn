@@ -75,7 +75,7 @@ def get_metric(pred,labels,name):
 ##__________________ Load data and make batches _____________________________________
 
 # Data folder
-data_folder=f"/home/gamouhh/files/yu_gnn"
+data_folder=f"/home/files/yu_gnn"
 EMB_NAME=args.emb_name
 FEAT_SIZES={"onehot":21,
             "bert":1024,
@@ -261,8 +261,8 @@ def train(GRAPHS,model,metric_name):
             if val_metric>best_score:
                 print("Saving model...")
                 best_score=val_metric
-                torch.save(model.state_dict(),f"/home/gamouhh/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{args.model_class}_{args.model_archi}_fold{args.fold}_model.pt")
-                # torch.save(model.state_dict(),f"/home/gamouhh/files/{EMB_NAME}_{LIGAND}_no_graph.pt")
+                torch.save(model.state_dict(),f"/home/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{args.model_class}_{args.model_archi}_fold{args.fold}_model.pt")
+                # torch.save(model.state_dict(),f"/home/files/{EMB_NAME}_{LIGAND}_no_graph.pt")
             RESULTS["Val MCC"].append(val_metric)
             print('In epoch {}, loss: {:.3f}, train {} : {:.3f} , val {} : {:.3f}'.format(
             e, loss,metric_name,train_metric,metric_name ,val_metric))
@@ -309,8 +309,8 @@ if args.ligand=="":
 else:
     LIGANDS=[args.ligand]
 
-# with open(f"/home/gamouhh/files/test_results_attention_cutoff_{CUTOFF}.txt","w") as test_file:
-with open(f"/home/gamouhh/files/test_results_seq_emb.txt","w") as test_file:
+# with open(f"/home/files/test_results_attention_cutoff_{CUTOFF}.txt","w") as test_file:
+with open(f"/home/files/test_results_seq_emb.txt","w") as test_file:
     for LIGAND in LIGANDS:
         print(f"Ligand type : {LIGAND}")
 
@@ -344,13 +344,13 @@ with open(f"/home/gamouhh/files/test_results_seq_emb.txt","w") as test_file:
         RESULTS=train(GRAPHS,model,metric_name="mcc")
         # Get results
         # Save training history
-        # pd.DataFrame(RESULTS).to_csv(f"/home/gamouhh/files/results_{EMB_NAME}_{LIGAND}_th_{CUTOFF}.csv")
+        # pd.DataFrame(RESULTS).to_csv(f"/home/files/results_{EMB_NAME}_{LIGAND}_th_{CUTOFF}.csv")
 
         # Final Test of the model
         if TEST_MODEL:
             model = GNN(args.layers).cuda()
-            model.load_state_dict(torch.load(f"/home/gamouhh/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{args.model_class}_{args.model_archi}_fold{args.fold}_model.pt"))
-            # model.load_state_dict(torch.load(f"/home/gamouhh/files/{EMB_NAME}_{LIGAND}_no_graph.pt"))
+            model.load_state_dict(torch.load(f"/home/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{args.model_class}_{args.model_archi}_fold{args.fold}_model.pt"))
+            # model.load_state_dict(torch.load(f"/home/files/{EMB_NAME}_{LIGAND}_no_graph.pt"))
             model.eval()
             # # Test on test set
             print("Evaluating on test set ...")

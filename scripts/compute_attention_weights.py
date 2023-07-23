@@ -40,7 +40,7 @@ warnings.filterwarnings("ignore")
 ##__________________ Load data and make batches _____________________________________
 
 # Data folder
-data_folder=f"/home/gamouhh/files/yu_gnn"
+data_folder=f"/home/files/yu_gnn"
 EMB_NAME=args.emb_name
 FEAT_SIZES={"onehot":21,
             "bert":1024,
@@ -490,7 +490,7 @@ CUTOFF=8
 print("Cutoff : ",CUTOFF)
 
 # baseline_model = Baseline().cuda()
-# baseline_model.load_state_dict(torch.load(f"/home/gamouhh/files/{EMB_NAME}_{LIGAND}_th_4_no_graph_deep_fold0_model.pt"))
+# baseline_model.load_state_dict(torch.load(f"/home/files/{EMB_NAME}_{LIGAND}_th_4_no_graph_deep_fold0_model.pt"))
 # baseline_model.eval()
 
 
@@ -533,12 +533,12 @@ LIGAND="GTP"
 print(LIGAND)
 MODEL_CLASS="gcn"
 gcn_model = GNN(MODEL_CLASS,LAYERS[MODEL_CLASS]).cuda()
-gcn_model.load_state_dict(torch.load(f"/home/gamouhh/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{MODEL_CLASS}_shallow_fold_model.pt"))
+gcn_model.load_state_dict(torch.load(f"/home/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{MODEL_CLASS}_shallow_fold_model.pt"))
 gcn_model.eval()
 
 MODEL_CLASS="gat"
 gat_model = GNN(MODEL_CLASS,LAYERS[MODEL_CLASS]).cuda()
-gat_model.load_state_dict(torch.load(f"/home/gamouhh/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{MODEL_CLASS}_shallow_fold_model.pt"))
+gat_model.load_state_dict(torch.load(f"/home/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{MODEL_CLASS}_shallow_fold_model.pt"))
 gat_model.eval()
 
 results[LIGAND]=[]

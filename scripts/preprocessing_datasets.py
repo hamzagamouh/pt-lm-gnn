@@ -257,17 +257,17 @@ EMB_NAME=args.emb_name
 
 ##### _____________________PREPROCESSING FILES_______________________________ 
 # Preprocess files and get graphs and chains
-data_folder="/home/gamouhh/files/datasets/yu_merged/"
+data_folder="/home/files/datasets/yu_merged/"
 cutoff=args.cutoff
 print("Cutoff",cutoff)
 
 
-folder="/home/gamouhh/files/yu_gnn/biolip_structures/"
+folder="/home/files/yu_gnn/biolip_structures/"
 biolip_files=[x[:4].upper() for x in os.listdir(folder+"receptor")]
 other_pdb_files=[x.replace("pdb","").replace(".ent","").upper() for x in os.listdir(folder+"other_pdbs")]
 obsolete_files=[x[:4].upper() for x in os.listdir(folder+"obsolete")]
 
-with zipfile.ZipFile(f'/home/gamouhh/files/yu_gnn/t5_embs/yu_embs.zip',"r") as thezip:
+with zipfile.ZipFile(f'/home/files/yu_gnn/t5_embs/yu_embs.zip',"r") as thezip:
     for output_folder in ["Training_sets","Testing_sets"]:
         for yu_file in os.listdir(data_folder+output_folder):
             print(f"Processing {yu_file}...")
@@ -284,7 +284,7 @@ with zipfile.ZipFile(f'/home/gamouhh/files/yu_gnn/t5_embs/yu_embs.zip',"r") as t
                 t5_embeddings=pickle.load(thezip.open(f"yu/{new_file[:-4]}.p",'r'))
 
 
-            with zipfile.ZipFile(f'/home/gamouhh/files/yu_gnn/{output_folder}/{EMB_NAME}_{yu_file[:-4]}_th_{cutoff}.zip',"w") as thezip:
+            with zipfile.ZipFile(f'/home/files/yu_gnn/{output_folder}/{EMB_NAME}_{yu_file[:-4]}_th_{cutoff}.zip',"w") as thezip:
                 for k in tqdm(range(df.shape[0])):
                     pdb_id=df["pdb_id"][k]
                     chain_id=df["chain_id"][k]
@@ -317,7 +317,7 @@ with zipfile.ZipFile(f'/home/gamouhh/files/yu_gnn/t5_embs/yu_embs.zip',"r") as t
                     for feat_name in all_feats.keys():
                         assert g.ndata["label"].shape[0]==g.ndata[feat_name].shape[0]
                     file_name=f"{EMB_NAME}_{pdb_id}_{chain_id}_th_{cutoff}.p"
-                    filepath="/home/gamouhh/files/"+file_name
+                    filepath="/home/files/"+file_name
                     pickle.dump(g,open(filepath,"wb"))
                     thezip.write(filepath,file_name,compress_type=zipfile.ZIP_BZIP2)
                     os.remove(filepath)
