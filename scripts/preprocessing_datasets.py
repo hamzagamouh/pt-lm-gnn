@@ -27,8 +27,8 @@ AMINO_ACIDS={'ALA':'A', 'ARG':'R', 'ASN':'N', 'ASP':'D', 'CYS':'C', 'GLN':'Q', '
              'GLY':'G', 'HIS':'H', 'ILE':'I', 'LEU':'L',
                  'LYS':'K', 'MET':'M', 'PHE':'F', 'PRO':'P', 'SER':'S'
              , 'THR':'T', 'TRP':'W', 'TYR':'Y', 'VAL':'V',
-             'PYL':'X','SEC':'X','UNK':'X','TOX':'W','MSE':'M','LLP':'K',
-              'TPO':'T','CME':'C','CSD':'C','MLY':'K', 'SEP':'S','CSO':'C'}  
+             'PYL':'X','SEC':'X','UNK':'X', # Unknown AAs
+             'TOX':'W','MSE':'M','LLP':'K','TPO':'T','CME':'C','CSD':'C','MLY':'K', 'SEP':'S','CSO':'C'}  # Modified AA
              # MSE is SELENOMETHIONINE treated as Methylene in Yu dataset !!!
 
 
@@ -61,57 +61,17 @@ from Bio.PDB.Polypeptide import PPBuilder
 
 pp_parser=PPBuilder()
 
+
+from manual_corrections import skip_letters,correct_sequence
+
 # Get residues from a chain
 def get_residues(chain,binding_residues,pdb_id,chain_id):
     residues=[]
     for k,res in enumerate(chain):
         # Manual corrections !!
-        if pdb_id=="2UZP" and chain_id=="A" and k==0:
-            continue
-        if pdb_id=="1FSU" and chain_id=="A" and k==50:
-            continue
-        
-        if pdb_id=="3KQA" and chain_id=="B" and k==66:
+        if skip_letters(k,pdb_id,chain_id):
             continue
 
-        if pdb_id=="1P49" and chain_id=="A":
-            if k==52:
-                continue
-        
-        if pdb_id=="3KNI" and chain_id=="Y":
-            if k==100:
-                continue
-        
-        if pdb_id=="3KNI" and chain_id=="H":
-            if k==163:
-                continue
-        
-        if pdb_id=="3KNK" and chain_id=="Z":
-            if k==176:
-                continue
-        
-        if pdb_id=="3OHJ" and chain_id=="X":
-            if k==92:
-                continue
-
-        if pdb_id=="3CAO" and chain_id=="A":
-            if k==1:
-                continue
-            
-        if pdb_id=="2YHW" and chain_id=="A":
-            if k==170:
-                continue
-        
-        if pdb_id=="3V2D" and chain_id=="F" and k==202:
-            continue
-        
-        if pdb_id=="3SWI" and chain_id=="A" and k==66:
-            continue
-            
-        if pdb_id=="4E6R" and chain_id=="A" and k==0:
-            continue
-
-        
         if is_AC(res):
             residues.append(res)
 
@@ -276,69 +236,8 @@ def process_file(folder,pdb_id,chain_id,dataset_seq,mode):
 
 
             # __________________ Manual modifications !! _____________________
-            if pdb_id=="1UC9":
-                l=list(seq)
-                l[133:149]=['G']*len(l[133:149])
-                seq=''.join(l)
-
-            if pdb_id=="3BFN":
-                l=list(seq)
-                l[281:]=['G']*len(l[281:])
-                seq=''.join(l)
-
-            if pdb_id=="3PIF":
-                l=list(seq)
-                l[429:448]=['G']*len(l[429:448])
-                l[892:907]=['G']*len(l[892:907])
-                seq=''.join(l)
+            seq=correct_sequence(seq,pdb_id,chain_id)
             
-            if pdb_id=="2GMK":
-                l=list(seq)
-                l[0]="E"
-                seq=''.join(l)
-            
-            if pdb_id=="1H1A" and chain_id=="A":
-                l=list(seq)
-                l[0]="E"
-                seq=''.join(l)
-            
-            if pdb_id=="1VCL" and chain_id=="A":
-                l=list(seq)
-                l[0]="E"
-                seq=''.join(l)
-            
-            if pdb_id=="1FSU" and chain_id=="A":
-                l=list(seq)
-                l[49]="T"
-                seq=''.join(l)
-            
-            if pdb_id=="1HDH" and chain_id=="A":
-                l=list(seq)
-                l[48]="A"
-                seq=''.join(l)
-            
-            if pdb_id=="1Q2E" and chain_id=="B":
-                l=list(seq)
-                l[0]="E"
-                seq=''.join(l)
-            
-            if pdb_id=="1PL3" and chain_id=="A":
-                l=list(seq)
-                l[0]="E"
-                seq=''.join(l)
-            
-            if pdb_id=="1CPO" and chain_id=="A":
-                l=list(seq)
-                l[0]="E"
-                seq=''.join(l)
-            
-            if pdb_id=="2FUQ" and chain_id=="A":
-                l=list(seq)
-                l[0]="E"
-                seq=''.join(l)
-            
-            
-            # ______________________________________________________________________
 
             try:
                 assert seq==dataset_seq
