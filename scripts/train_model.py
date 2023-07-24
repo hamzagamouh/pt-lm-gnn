@@ -75,7 +75,7 @@ def get_metric(pred,labels,name):
 ##__________________ Load data and make batches _____________________________________
 
 # Data folder
-data_folder=f"/home/files/yu_gnn"
+data_folder=f"../datasets"
 EMB_NAME=args.emb_name
 FEAT_SIZES={"onehot":21,
             "bert":1024,
@@ -170,11 +170,6 @@ def get_graphs(mode,LIGAND):
 
 print(f"Cutoff value : {CUTOFF}")
 
-PREFIX=""
-if EMB_NAME=="bert":
-    PREFIX='bert_'
-if EMB_NAME=="aaindex":
-    PREFIX='pc_'
 
 
 def get_batch(GRAPHS,a,b,mode):
@@ -183,7 +178,7 @@ def get_batch(GRAPHS,a,b,mode):
         batch_graph+=[graph]
     batch_graph=dgl.batch(batch_graph)
     batch_graph=batch_graph.to(DEVICE)
-    features = batch_graph.ndata[PREFIX+'feat'].to(DEVICE)
+    features = batch_graph.ndata[EMB_NAME].to(DEVICE)
     labels = batch_graph.ndata['label'].to(DEVICE)
     w0=0
     w1=0
@@ -261,7 +256,7 @@ def train(GRAPHS,model,metric_name):
             if val_metric>best_score:
                 print("Saving model...")
                 best_score=val_metric
-                torch.save(model.state_dict(),f"/home/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{args.model_class}_{args.model_archi}_fold{args.fold}_model.pt")
+                torch.save(model.state_dict(),f"../models/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{args.model_class}_{args.model_archi}_fold{args.fold}_model.pt")
                 # torch.save(model.state_dict(),f"/home/files/{EMB_NAME}_{LIGAND}_no_graph.pt")
             RESULTS["Val MCC"].append(val_metric)
             print('In epoch {}, loss: {:.3f}, train {} : {:.3f} , val {} : {:.3f}'.format(
@@ -349,8 +344,7 @@ with open(f"/home/files/test_results_seq_emb.txt","w") as test_file:
         # Final Test of the model
         if TEST_MODEL:
             model = GNN(args.layers).cuda()
-            model.load_state_dict(torch.load(f"/home/files/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{args.model_class}_{args.model_archi}_fold{args.fold}_model.pt"))
-            # model.load_state_dict(torch.load(f"/home/files/{EMB_NAME}_{LIGAND}_no_graph.pt"))
+            model.load_state_dict(torch.load(f"../models/{EMB_NAME}_{LIGAND}_th_{CUTOFF}_{args.model_class}_{args.model_archi}_fold{args.fold}_model.pt"))
             model.eval()
             # # Test on test set
             print("Evaluating on test set ...")

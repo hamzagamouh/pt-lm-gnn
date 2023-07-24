@@ -17,7 +17,6 @@ warnings.filterwarnings("ignore")
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--emb_name", default="all_embs", type=str, help="Embedding name : onehot, bert, xlnet, t5")
 parser.add_argument("--cutoff", default=8, type=int, help="Define the graph threshold in Angstroms : 4,6,8,10,12")
 
 args = parser.parse_args()
@@ -146,61 +145,6 @@ def get_graph(chain,binding_residues,pdb_id,chain_id,cutoff):
     return scipy.sparse.csr_matrix(A),labels
 
 
-## AAIndex embeddings
-from aaindex import aaindex1
-CODES=aaindex1.record_codes()
-
-AA_INDEX_AMINO_ACIDS=aaindex1.amino_acids()
-
-ALL_VALUES={aa:[] for aa in AA_INDEX_AMINO_ACIDS}
-
-for code in CODES:
-    values=aaindex1[code].values
-    for aa in AA_INDEX_AMINO_ACIDS:
-        ALL_VALUES[aa]+=[values[aa]]
-
-
-for k,aa in enumerate(ALL_VALUES.keys()):
-    vals=np.array(ALL_VALUES[aa]).reshape(1,-1)
-    if k==0:
-        pc_embs=vals
-    else:
-        pc_embs=np.concatenate([pc_embs,vals],axis=0)
-
-PC_EMBS=(pc_embs-np.mean(pc_embs,axis=0).reshape(1,-1))/np.std(pc_embs,axis=0).reshape(1,-1)
-
-def create_aaindex_emb(seq):
-    for k,x in enumerate(seq):
-        idx=AA_INDEX_AMINO_ACIDS.index(x)
-        aa_emb=PC_EMBS[idx].reshape(1,-1)
-        if k==0:
-            emb=aa_emb
-        else:
-            emb=np.concatenate([emb,aa_emb],axis=0)
-    return emb
-
-# ______________ Protrans language models ______________
-
-print("Importing embedders...")
-EMBEDDERS={}
-# BERT 
-from bio_embeddings.embed.prottrans_bert_bfd_embedder import ProtTransBertBFDEmbedder
-EMBEDDERS["bert"]=ProtTransBertBFDEmbedder(device="cpu")
-
-# T5
-from bio_embeddings.embed.prottrans_t5_embedder import ProtTransT5XLU50Embedder
-EMBEDDERS["t5"]=ProtTransT5XLU50Embedder(device="cpu",half_model=True)
-
-def get_embeddings(seq,feats):
-    all_embs={}
-    if feats is None:
-        all_embs["feat"]=EMBEDDERS["t5"].embed(seq)
-    else:
-        all_embs["feat"]=feats
-    all_embs["pc_feat"]=create_aaindex_emb(seq)
-    all_embs["bert_feat"]=EMBEDDERS["bert"].embed(seq)
-    # Get the sequence embeddings
-    return all_embs
 
 
 def create_dgl_graph(chains,binding_residues,pdb_id,chain_id,cutoff):
@@ -251,40 +195,36 @@ def process_file(folder,pdb_id,chain_id,dataset_seq,mode):
 
 
 
-EMB_NAME=args.emb_name
 
 
 
 ##### _____________________PREPROCESSING FILES_______________________________ 
 # Preprocess files and get graphs and chains
-data_folder="/home/files/datasets/yu_merged/"
+data_folder="../datasets/yu_merged/"
 cutoff=args.cutoff
 print("Cutoff",cutoff)
 
 
-folder="/home/files/yu_gnn/biolip_structures/"
+folder="../datasets/biolip_structures/"
 biolip_files=[x[:4].upper() for x in os.listdir(folder+"receptor")]
 other_pdb_files=[x.replace("pdb","").replace(".ent","").upper() for x in os.listdir(folder+"other_pdbs")]
 obsolete_files=[x[:4].upper() for x in os.listdir(folder+"obsolete")]
 
-with zipfile.ZipFile(f'/home/files/yu_gnn/t5_embs/yu_embs.zip',"r") as thezip:
-    for output_folder in ["Training_sets","Testing_sets"]:
-        for yu_file in os.listdir(data_folder+output_folder):
-            print(f"Processing {yu_file}...")
-            yu_path=os.path.join(data_folder,output_folder,yu_file)
-            # df=pd.read_csv(yu_path,sep=";",names=["pdb_id", "chain_id", "bs_num", "ligand", "binding_residues","sequence"])
-            df=pd.read_csv(yu_path,sep=";")
+for output_folder in ["Training_sets","Testing_sets"]:
+    for yu_file in os.listdir(data_folder+output_folder):
+        print(f"Processing {yu_file}...")
+        if "Training" in output_folder:
+            zip_filename=f'{data_folder}/{output_folder}/all_embs_{LIGAND}_Training.zip'
+            mode="Training"
+        else:
+            zip_filename=f'{data_folder}/{output_folder}/all_embs_{LIGAND}_Testing.zip'
+            mode="Validation"
 
-            if ("DNA" not in yu_file):
-                # print(thezip.namelist())
-                if "HEME" in yu_file:
-                    new_file=yu_file.replace("HEME","HEM")
-                else:
-                    new_file=yu_file
-                t5_embeddings=pickle.load(thezip.open(f"yu/{new_file[:-4]}.p",'r'))
-
-
-            with zipfile.ZipFile(f'/home/files/yu_gnn/{output_folder}/{EMB_NAME}_{yu_file[:-4]}_th_{cutoff}.zip',"w") as thezip:
+        LIGAND=yu_file[:-4]
+        yu_path=os.path.join(data_folder,output_folder,yu_file)
+        df=pd.read_csv(yu_path,sep=";")
+        with zipfile.ZipFile(f'../datasets/{output_folder}/all_embs_{LIGAND}_{mode}_th_{cutoff}.zip',"w") as thezip:
+            with zipfile.ZipFile(zip_filename,'r') as embs_zip:
                 for k in tqdm(range(df.shape[0])):
                     pdb_id=df["pdb_id"][k]
                     chain_id=df["chain_id"][k]
@@ -307,17 +247,14 @@ with zipfile.ZipFile(f'/home/files/yu_gnn/t5_embs/yu_embs.zip',"r") as thezip:
                     chain=process_file(folder,pdb_id,chain_id,dataset_seq,mode)
 
                     g=create_dgl_graph(chain,binding_residues,pdb_id,chain_id,cutoff)
-                    if ("DNA" not in yu_file):
-                        feats=t5_embeddings[f"{pdb_id}_{chain_id}"][0]
-                    else:
-                        feats=None
-                    all_feats=get_embeddings(dataset_seq,feats)
+                    
+                    all_feats=pickle.load(embs_zip.read(f"{pdb_id}_{chain_id}.p"))
 
                     g=create_dgl_data(g,all_feats)
                     for feat_name in all_feats.keys():
                         assert g.ndata["label"].shape[0]==g.ndata[feat_name].shape[0]
-                    file_name=f"{EMB_NAME}_{pdb_id}_{chain_id}_th_{cutoff}.p"
-                    filepath="/home/files/"+file_name
+                    file_name=f"all_embs_{pdb_id}_{chain_id}_th_{cutoff}.p"
+                    filepath="../datasets/"+file_name
                     pickle.dump(g,open(filepath,"wb"))
                     thezip.write(filepath,file_name,compress_type=zipfile.ZIP_BZIP2)
                     os.remove(filepath)

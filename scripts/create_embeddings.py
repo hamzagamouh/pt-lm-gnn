@@ -74,7 +74,7 @@ for LIGAND in LIGANDS:
             all_embs={}
             chain=train_df["pdb_id"][k]+"_"+train_df["chain_id"][k]
             seq=train_df["sequence"][k]
-            all_embs["pc_feat"]=create_aaindex_emb(seq)
+            all_embs["aaindex"]=create_aaindex_emb(seq)
             all_embs["bert"]=create_bert_emb(seq)
             all_embs["t5"]=create_t5_emb(seq)
             file=f"{chain}.p"
@@ -83,12 +83,12 @@ for LIGAND in LIGANDS:
             new_zip.write(dest,file,compress_type=zipfile.ZIP_BZIP2)
             os.remove(dest)
     
-    with zipfile.ZipFile(f'{data_folder}/Testing_sets/all_embs_{LIGAND}_Validation.zip','w') as new_zip:
+    with zipfile.ZipFile(f'{data_folder}/Testing_sets/all_embs_{LIGAND}_Testing.zip','w') as new_zip:
         for k in range(test_df.shape[0]):  
             all_embs={}
             chain=test_df["pdb_id"][k]+"_"+test_df["chain_id"][k]
             seq=test_df["sequence"][k]
-            all_embs["pc_feat"]=create_aaindex_emb(seq)
+            all_embs["aaindex"]=create_aaindex_emb(seq)
             all_embs["bert"]=create_bert_emb(seq)
             all_embs["t5"]=create_t5_emb(seq)
             file=f"{chain}.p"
