@@ -4,11 +4,12 @@ from tqdm import tqdm
 import numpy as np
 import os,zipfile,pickle
 import pandas as pd
-import dgl
-import torch
 
 from bio_embeddings.embed.prottrans_bert_bfd_embedder import ProtTransBertBFDEmbedder
 BERT_EMBEDDER=ProtTransBertBFDEmbedder()
+
+from bio_embeddings.embed.prottrans_t5_embedder import ProtTransT5XLU50Embedder
+T5_EMBEDDER=ProtTransT5XLU50Embedder(half_model=True)
 
 CODES=aaindex1.record_codes()
 
@@ -44,82 +45,54 @@ def create_aaindex_emb(seq):
 
 def create_bert_emb(seq):
     return BERT_EMBEDDER.embed(seq)
+
+def create_t5_emb(seq):
+    return T5_EMBEDDER.embed(seq)
         
 
 
 
-data_folder=f"/home/files/yu_gnn"
-yu_data_folder="/home/files/datasets/yu_merged/"
+data_folder=f"embeddings"
+yu_data_folder="../datasets/yu_merged/"
 
 
 
 
-# LIGAND="AMP"
-EMB_NAME="t5"
-CUTOFFS=[6]#[4,6,10]
-LIGANDS=["ADP"]#["ADP", "AMP", "ATP", "CA", "FE", "GDP", "GTP", "HEME", "MG", "MN", "ZN"]
 
-for CUTOFF in CUTOFFS:
-    for LIGAND in LIGANDS:
-        print(LIGAND)
-        yu_path=os.path.join(yu_data_folder,"Training_sets",f"{LIGAND}_Training.txt")
-        train_df=pd.read_csv(yu_path,sep=";")
-        yu_path=os.path.join(yu_data_folder,"Testing_sets",f"{LIGAND}_Validation.txt")
-        test_df=pd.read_csv(yu_path,sep=";")
+LIGANDS=["ADP", "AMP", "ATP", "CA", "FE", "GDP", "GTP", "HEME", "MG", "MN", "ZN"]
 
-        train_seqs={}
-        test_seqs={}
+for LIGAND in LIGANDS:
+    print(f"Computing embeddings for {LIGAND}")
+    yu_path=os.path.join(yu_data_folder,"Training_sets",f"{LIGAND}_Training.txt")
+    train_df=pd.read_csv(yu_path,sep=";")
+    yu_path=os.path.join(yu_data_folder,"Testing_sets",f"{LIGAND}_Validation.txt")
+    test_df=pd.read_csv(yu_path,sep=";")
 
-        for k in range(train_df.shape[0]):
+
+    with zipfile.ZipFile(f'{data_folder}/Training_sets/all_embs_{LIGAND}_Training.zip','w') as new_zip:
+        for k in range(train_df.shape[0]):  
+            all_embs={}
             chain=train_df["pdb_id"][k]+"_"+train_df["chain_id"][k]
-            train_seqs[chain]=train_df["sequence"][k]
-        
-
-        for k in range(test_df.shape[0]):
+            seq=train_df["sequence"][k]
+            all_embs["pc_feat"]=create_aaindex_emb(seq)
+            all_embs["bert"]=create_bert_emb(seq)
+            all_embs["t5"]=create_t5_emb(seq)
+            file=f"{chain}.p"
+            dest=f"{data_folder}/{file}"
+            pickle.dump(all_embs,open(dest,"wb"))
+            new_zip.write(dest,file,compress_type=zipfile.ZIP_BZIP2)
+            os.remove(dest)
+    
+    with zipfile.ZipFile(f'{data_folder}/Testing_sets/all_embs_{LIGAND}_Validation.zip','w') as new_zip:
+        for k in range(test_df.shape[0]):  
+            all_embs={}
             chain=test_df["pdb_id"][k]+"_"+test_df["chain_id"][k]
-            test_seqs[chain]=test_df["sequence"][k]
-
-
-        train_zip=zipfile.ZipFile(f'{data_folder}/Training_sets/{EMB_NAME}_{LIGAND}_Training_th_{CUTOFF}.zip','r')
-        test_zip=zipfile.ZipFile(f'{data_folder}/Testing_sets/{EMB_NAME}_{LIGAND}_Validation_th_{CUTOFF}.zip','r')
-        train_graphs=train_zip.namelist()
-        test_graphs=test_zip.namelist()
-
-
-        with zipfile.ZipFile(f'{data_folder}/Training_sets/all_embs_{LIGAND}_Training_th_{CUTOFF}.zip','w') as new_train_zip:
-            for file in tqdm(train_graphs):
-                chain=file.replace('t5_','').replace(f'_th_{CUTOFF}.p','')
-                seq=train_seqs[chain]
-                dest=f"{data_folder}/{file}"
-                train_zip.extract(file,data_folder)
-                graph=pickle.load(open(dest,'rb'))
-
-                graph.ndata["pc_feat"]=torch.tensor(create_aaindex_emb(seq)).float()
-                graph.ndata["bert_feat"]=torch.tensor(create_bert_emb(seq)).float()
-                assert graph.ndata["feat"].shape[0]==graph.ndata["pc_feat"].shape[0]
-                assert graph.ndata["feat"].shape[0]==graph.ndata["bert_feat"].shape[0]
-                
-                file_name=file.replace("t5","all_embs")
-                pickle.dump(graph,open(dest,"wb"))
-                new_train_zip.write(dest,file_name,compress_type=zipfile.ZIP_BZIP2)
-                os.remove(dest)
-
-
-
-        with zipfile.ZipFile(f'{data_folder}/Testing_sets/all_embs_{LIGAND}_Validation_th_{CUTOFF}.zip','w') as new_test_zip:
-            for file in tqdm(test_graphs):
-                chain=file.replace('t5_','').replace(f'_th_{CUTOFF}.p','')
-                seq=test_seqs[chain]
-                dest=f"{data_folder}/{file}"
-                test_zip.extract(file,data_folder)
-                graph=pickle.load(open(dest,'rb'))
-
-                graph.ndata["pc_feat"]=torch.tensor(create_aaindex_emb(seq)).float()
-                graph.ndata["bert_feat"]=torch.tensor(create_bert_emb(seq)).float()
-                assert graph.ndata["feat"].shape[0]==graph.ndata["pc_feat"].shape[0]
-                assert graph.ndata["feat"].shape[0]==graph.ndata["bert_feat"].shape[0]
-                
-                file_name=file.replace("t5","all_embs")
-                pickle.dump(graph,open(dest,"wb"))
-                new_test_zip.write(dest,file_name,compress_type=zipfile.ZIP_BZIP2)
-                os.remove(dest)
+            seq=test_df["sequence"][k]
+            all_embs["pc_feat"]=create_aaindex_emb(seq)
+            all_embs["bert"]=create_bert_emb(seq)
+            all_embs["t5"]=create_t5_emb(seq)
+            file=f"{chain}.p"
+            dest=f"{data_folder}/{file}"
+            pickle.dump(all_embs,open(dest,"wb"))
+            new_zip.write(dest,file,compress_type=zipfile.ZIP_BZIP2)
+            os.remove(dest)

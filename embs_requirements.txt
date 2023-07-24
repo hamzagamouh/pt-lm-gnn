@@ -1,0 +1,4 @@
+tqdm
+biopython
+transformers
+bio-embeddings[transformers]
