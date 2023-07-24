@@ -30,7 +30,10 @@ To construct the input data to the models, please run `scripts/preprocessing_dat
 5. Constructs the residue contact map (using the CUTOFF distance parameter) and converts it to a DGL graph with embedding features and binary labels for residues.
 
 ## Training models
-To train and validate the model please run `scripts/train_model.py`
+To train and test the models please run `scripts/train_model.py`. 
+
+## Results
+To generate our result tables, please run  `scripts/create_result_tables.py`
 
 ## Models
 TBA
