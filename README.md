@@ -11,7 +11,7 @@ To run the scripts, please install the Conda environement by following these ste
 4. Install other pip requirements --> `pip install requirements.txt`
    
 ## Datasets
-The original sequence datasets designed by Yu et al. are in `datasets/yu_merged`. The datasets contain protein sequences organized by their protein PDB ID and chain ID, as well as their true binding residues. Originally, there were multiple entries of binding residues due to the existence of multiple instances of a ligand, we merged the binding residues for each unique protein sequence. We also extracted the corresponding structures from BioLip, you can download them here (link).
+The original sequence datasets designed by Yu et al. are in `datasets/yu_merged`. The datasets contain protein sequences organized by their protein PDB ID and chain ID, as well as their true binding residues. Originally, there were multiple entries of binding residues due to the existence of multiple instances of a ligand, we merged the binding residues for each unique protein sequence. We also extracted the corresponding structures from BioLip, you can download them [here](https://cunicz-my.sharepoint.com/:f:/g/personal/88889462_cuni_cz/Epl85n_aRMVGuwsELWLPvWsBSKG__2_e3x6F1Rv4itPoGg?e=9IVYdm).
 
 ## Embeddings computation
 For embeddings computation, please note that the `bio-embeddings` package works best in Python 3.7. Therefore, please follow these steps :
@@ -36,7 +36,7 @@ To train and test the models please run `scripts/train_model.py`.
 To generate our result tables, please run  `scripts/create_result_tables.py`
 
 ## Models
-TBA
+We trained two major architectures Graph Convolutional Networks (GCN) and Graph Attention Networks (GAT) for all cutoff  distances 4, 6, 8 and 10 Angstroms. You download our trained models [here](https://cunicz-my.sharepoint.com/:f:/g/personal/88889462_cuni_cz/EqFARaVLNctBn8kupuW26qkBgUew3qjhCo4HdDRXgvKyGQ?e=5v5lEn).
 
 ## Try a prediction by our GAT ensemble model
 TBA
