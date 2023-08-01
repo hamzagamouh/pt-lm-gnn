@@ -36,7 +36,7 @@ To train and test the models please run `scripts/train_model.py`.
 To generate our result tables, please run  `scripts/create_result_tables.py`
 
 ## Models
-We trained two major architectures Graph Convolutional Networks (GCN) and Graph Attention Networks (GAT) for all cutoff  distances 4, 6, 8 and 10 Angstroms. You download our trained models [here](https://cunicz-my.sharepoint.com/:f:/g/personal/88889462_cuni_cz/EqFARaVLNctBn8kupuW26qkBgUew3qjhCo4HdDRXgvKyGQ?e=5v5lEn).
+We trained two major architectures : Graph Convolutional Networks (GCN) and Graph Attention Networks (GAT) for all cutoff  distances 4, 6, 8 and 10 Angstroms. You can download our trained models [here](https://cunicz-my.sharepoint.com/:f:/g/personal/88889462_cuni_cz/EqFARaVLNctBn8kupuW26qkBgUew3qjhCo4HdDRXgvKyGQ?e=5v5lEn).
 
 ## Try a prediction by our GAT ensemble model
 TBA
