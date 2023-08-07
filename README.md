@@ -8,7 +8,7 @@ To run the scripts, please install the Conda environement by following these ste
 1. Create a Conda environment --> `conda create --name plm-gnn python=3.10`
 2. Activate the environment --> `conda activate plm-gnn`
 3. If you have GPUs install pytorch for CUDA --> `conda install pytorch torchvision torchaudio pytorch-cuda=11.7 cuda -c pytorch -c "nvidia/label/cuda-11.7.1"`
-4. Install other pip requirements --> `pip install requirements.txt`
+4. Install other pip requirements --> `pip install -r requirements.txt`
    
 ## Datasets
 The original sequence datasets designed by Yu et al. are in `datasets/yu_merged`. The datasets contain protein sequences organized by their protein PDB ID and chain ID, as well as their true binding residues. Originally, there were multiple entries of binding residues due to the existence of multiple instances of a ligand, we merged the binding residues for each unique protein sequence. We also extracted the corresponding structures from BioLip, you can download them [here](https://cunicz-my.sharepoint.com/:f:/g/personal/88889462_cuni_cz/Epl85n_aRMVGuwsELWLPvWsBSKG__2_e3x6F1Rv4itPoGg?e=9IVYdm).
