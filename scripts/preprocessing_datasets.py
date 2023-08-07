@@ -1,4 +1,3 @@
-from fileinput import filename
 import os
 import numpy as np
 import pandas as pd
@@ -14,12 +13,6 @@ from tqdm import tqdm
 import warnings
 warnings.filterwarnings("ignore")
 
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--cutoff", default=8, type=int, help="Define the graph threshold in Angstroms : 4,6,8,10,12")
-
-args = parser.parse_args()
 
 # Amino acid codons
 AMINO_ACIDS={'ALA':'A', 'ARG':'R', 'ASN':'N', 'ASP':'D', 'CYS':'C', 'GLN':'Q', 'GLU':'E',
@@ -199,63 +192,72 @@ def process_file(folder,pdb_id,chain_id,dataset_seq,mode):
 
 
 ##### _____________________PREPROCESSING FILES_______________________________ 
-# Preprocess files and get graphs and chains
-data_folder="../datasets/yu_merged/"
-cutoff=args.cutoff
-print("Cutoff",cutoff)
+
+if __name__=='__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cutoff", default=8, type=int, help="Define the graph threshold in Angstroms : 4,6,8,10,12")
+    parser.add_argument("--pdb_file", default="", type=str, help="")
+
+    args = parser.parse_args()
+    # Preprocess files and get graphs and chains
+    data_folder="../datasets/yu_merged/"
+    cutoff=args.cutoff
+    print("Cutoff",cutoff)
 
 
-folder="../datasets/biolip_structures/"
-biolip_files=[x[:4].upper() for x in os.listdir(folder+"receptor")]
-other_pdb_files=[x.replace("pdb","").replace(".ent","").upper() for x in os.listdir(folder+"other_pdbs")]
-obsolete_files=[x[:4].upper() for x in os.listdir(folder+"obsolete")]
+    folder="../datasets/biolip_structures/"
+    biolip_files=[x[:4].upper() for x in os.listdir(folder+"receptor")]
+    other_pdb_files=[x.replace("pdb","").replace(".ent","").upper() for x in os.listdir(folder+"other_pdbs")]
+    obsolete_files=[x[:4].upper() for x in os.listdir(folder+"obsolete")]
 
-for output_folder in ["Training_sets","Testing_sets"]:
-    for yu_file in os.listdir(data_folder+output_folder):
-        print(f"Processing {yu_file}...")
-        if "Training" in output_folder:
-            zip_filename=f'{data_folder}/{output_folder}/all_embs_{LIGAND}_Training.zip'
-            mode="Training"
-        else:
-            zip_filename=f'{data_folder}/{output_folder}/all_embs_{LIGAND}_Testing.zip'
-            mode="Validation"
+    for output_folder in ["Training_sets","Testing_sets"]:
+        for yu_file in os.listdir(data_folder+output_folder):
+            print(f"Processing {yu_file}...")
+            if "Training" in output_folder:
+                zip_filename=f'{data_folder}/{output_folder}/all_embs_{LIGAND}_Training.zip'
+                mode="Training"
+            else:
+                zip_filename=f'{data_folder}/{output_folder}/all_embs_{LIGAND}_Testing.zip'
+                mode="Validation"
 
-        LIGAND=yu_file[:-4]
-        yu_path=os.path.join(data_folder,output_folder,yu_file)
-        df=pd.read_csv(yu_path,sep=";")
-        with zipfile.ZipFile(f'../datasets/{output_folder}/all_embs_{LIGAND}_{mode}_th_{cutoff}.zip',"w") as thezip:
-            with zipfile.ZipFile(zip_filename,'r') as embs_zip:
-                for k in tqdm(range(df.shape[0])):
-                    pdb_id=df["pdb_id"][k]
-                    chain_id=df["chain_id"][k]
-                    binding_residues=df["binding_residues"][k].split(" ")
-                    dataset_seq=df["sequence"][k]
-                    if pdb_id in other_pdb_files:
-                        mode="pdb"
-                    elif pdb_id in biolip_files:
-                        mode="biolip"
-                    elif pdb_id in obsolete_files:
-                        mode="cif"
+            LIGAND=yu_file[:-4]
+            yu_path=os.path.join(data_folder,output_folder,yu_file)
+            df=pd.read_csv(yu_path,sep=";")
+            with zipfile.ZipFile(f'../datasets/{output_folder}/all_embs_{LIGAND}_{mode}_th_{cutoff}.zip',"w") as thezip:
+                with zipfile.ZipFile(zip_filename,'r') as embs_zip:
+                    for k in tqdm(range(df.shape[0])):
+                        pdb_id=df["pdb_id"][k]
+                        chain_id=df["chain_id"][k]
+                        binding_residues=df["binding_residues"][k].split(" ")
+                        dataset_seq=df["sequence"][k]
+                        if pdb_id in other_pdb_files:
+                            mode="pdb"
+                        elif pdb_id in biolip_files:
+                            mode="biolip"
+                        elif pdb_id in obsolete_files:
+                            mode="cif"
 
-                    # Problematic chains !!!! (We will not include those)
-                    if pdb_id=="1WA5" and chain_id=='C':
-                        continue
+                        # Problematic chains !!!! (We will not include those)
+                        if pdb_id=="1WA5" and chain_id=='C':
+                            continue
 
-                    if pdb_id=="2FBW" and chain_id=="C":
-                        continue
+                        if pdb_id=="2FBW" and chain_id=="C":
+                            continue
 
-                    chain=process_file(folder,pdb_id,chain_id,dataset_seq,mode)
+                        chain=process_file(folder,pdb_id,chain_id,dataset_seq,mode)
 
-                    g=create_dgl_graph(chain,binding_residues,pdb_id,chain_id,cutoff)
-                    
-                    all_feats=pickle.load(embs_zip.read(f"{pdb_id}_{chain_id}.p"))
+                        g=create_dgl_graph(chain,binding_residues,pdb_id,chain_id,cutoff)
+                        
+                        all_feats=pickle.load(embs_zip.read(f"{pdb_id}_{chain_id}.p"))
 
-                    g=create_dgl_data(g,all_feats)
-                    for feat_name in all_feats.keys():
-                        assert g.ndata["label"].shape[0]==g.ndata[feat_name].shape[0]
-                    file_name=f"all_embs_{pdb_id}_{chain_id}_th_{cutoff}.p"
-                    filepath="../datasets/"+file_name
-                    pickle.dump(g,open(filepath,"wb"))
-                    thezip.write(filepath,file_name,compress_type=zipfile.ZIP_BZIP2)
-                    os.remove(filepath)
+                        g=create_dgl_data(g,all_feats)
+                        for feat_name in all_feats.keys():
+                            assert g.ndata["label"].shape[0]==g.ndata[feat_name].shape[0]
+                        file_name=f"all_embs_{pdb_id}_{chain_id}_th_{cutoff}.p"
+                        filepath="../datasets/"+file_name
+                        pickle.dump(g,open(filepath,"wb"))
+                        thezip.write(filepath,file_name,compress_type=zipfile.ZIP_BZIP2)
+                        os.remove(filepath)
 
