@@ -42,6 +42,6 @@ We trained two major architectures : Graph Convolutional Networks (GCN) and Grap
 ## Try a prediction by our GAT ensemble model
 To run a prediction using our GAT ensemble model (cutoffs : 4,6,8,10), please run the following commands:
 1. Change directory to be in "scripts" folder `cd scripts`
-2. Run `python inference.py --pdb_file your_pdb.pdb`
+2. Run inference by providing your PDB file `python inference.py --pdb_file your_pdb.pdb`
    
 You can try a PDB example `python inference.py --pdb_file 1a2b.pdb` 
