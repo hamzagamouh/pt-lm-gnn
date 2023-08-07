@@ -19,7 +19,7 @@ For embeddings computation, please note that the `bio-embeddings` package works 
 1. Create another Conda environment --> `conda create --name protein_embs python=3.7`
 2. Activate the environment --> `conda activate protein_embs`
 3. Install pip requirements --> `pip install -r embs_requirements.txt`
-4. To compute the embeddings for the whole dataset please run `scripts/create_embeddings.py`
+4. To compute the embeddings for the whole dataset please run `python scripts/create_dataset_embeddings.py`
 5. Switch to the main environment by running `conda deactivate` and then `conda activate plm-gnn`
 
 ## Protein graph construction
@@ -31,13 +31,17 @@ To construct the input data to the models, please run `scripts/preprocessing_dat
 5. Constructs the residue contact map (using the CUTOFF distance parameter) and converts it to a DGL graph with embedding features and binary labels for residues.
 
 ## Training models
-To train and test the models please run `scripts/train_model.py`. 
+To train and test the models please run `python scripts/train_model.py`. 
 
 ## Results
-To generate our result tables, please run  `scripts/create_result_tables.py`
+To generate our result tables, please run  `python scripts/create_result_tables.py`
 
 ## Models
 We trained two major architectures : Graph Convolutional Networks (GCN) and Graph Attention Networks (GAT) for all cutoff  distances 4, 6, 8 and 10 Angstroms. You can download our trained models [here](https://cunicz-my.sharepoint.com/:f:/g/personal/88889462_cuni_cz/EqFARaVLNctBn8kupuW26qkBgUew3qjhCo4HdDRXgvKyGQ?e=5v5lEn).
 
 ## Try a prediction by our GAT ensemble model
-TBA
+To run a prediction using our GAT ensemble model (cutoffs : 4,6,8,10), please run the following commands:
+1. Change directory to be in "scripts" folder `cd scripts`
+2. Run `python inference.py --pdb_file your_pdb.pdb`
+   
+You can try a PDB example `python inference.py --pdb_file 1a2b.pdb` 
