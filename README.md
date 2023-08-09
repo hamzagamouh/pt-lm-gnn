@@ -1,6 +1,6 @@
-# Utilizing Protein Language Models combined with Graph Neural Networks for Protein-Ligand Binding Sites detection
+# Hybrid protein-ligand binding residue prediction with protein language models: Does the structure matter?
 
-This is the code repository for our paper "Utilizing Protein Language Models combined with Graph Neural Networks for Protein-Ligand Binding Sites detection".
+This is the code repository for our paper "Hybrid protein-ligand binding residue prediction with protein language models: Does the structure matter?" by Hamza Gamouh, Marian Novotny, and David Hoksza.
 
 
 ## Environment setup
