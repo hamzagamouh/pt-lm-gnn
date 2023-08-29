@@ -16,9 +16,9 @@ The original sequence datasets designed by Yu et al. are in `datasets/yu_merged`
 <br>
 The structure files are organized in three folders :
 <ul>
-   <li>`receptor` : Structure files extracted directly from the BioLip database and where the PDB ID and chain ID of the original sequence files match exactly.</li>
-   <li>`obsolete` : Structure files missing from BioLip and downloaded from PDB RCSB where the PDB ID in the sequence files is obsolete. (they are in `.cif` format)</li>
-   <li>`other_pdbs` : Remaining structure files missing from BioLip and downloaded from PDB RCSB.</li>
+   <li> `receptor` : Structure files extracted directly from the BioLip database and where the PDB ID and chain ID of the original sequence files match exactly.</li>
+   <li> `obsolete` : Structure files missing from BioLip and downloaded from PDB RCSB where the PDB ID in the sequence files is obsolete. (they are in `.cif` format)</li>
+   <li> `other_pdbs` : Remaining structure files missing from BioLip and downloaded from PDB RCSB.</li>
 </ul>
 
 
