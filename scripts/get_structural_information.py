@@ -147,7 +147,7 @@ if __name__=='__main__':
             print("Processing",yu_file)
             yu_path=os.path.join(data_folder,output_folder,yu_file)
             df=pd.read_csv(yu_path,sep=";")
-            with zipfile.ZipFile(f'../datasets/structural_information/{output_folder}/{output_folder}_structural_info.zip',"w") as thezip:
+            with zipfile.ZipFile(f"../datasets/structural_information/{output_folder}/{yu_file.replace('.txt','')}_structural_info.zip","w") as thezip:
                 for k in tqdm(range(df.shape[0])):
                     try:
                         pdb_id=df["pdb_id"][k]
