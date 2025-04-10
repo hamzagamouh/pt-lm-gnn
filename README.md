@@ -12,7 +12,13 @@ To run the scripts, please install the Conda environement by following these ste
 5. Install other pip requirements --> `pip install -r requirements.txt`
    
 ## Datasets
-The original sequence datasets designed by Yu et al. are in `datasets/yu_merged`. The datasets contain protein sequences organized by their protein PDB ID and chain ID, as well as their true binding residues. Originally, there were multiple entries of binding residues due to the existence of multiple instances of a ligand, we merged the binding residues for each unique protein sequence. We also extracted the corresponding structures from BioLip, you can download them using [this link](https://cunicz-my.sharepoint.com/:f:/g/personal/88889462_cuni_cz/Epl85n_aRMVGuwsELWLPvWsBSKG__2_e3x6F1Rv4itPoGg?e=9IVYdm). 
+All the datasets used are provided in the archive `datasets.zip` in the following Zenodo link :
+- Yu dataset
+- DNA-RNA benchmark datasets
+- PDBBindv2020
+The two first datasets contain protein sequences organized by their protein PDB ID and chain ID, as well as the annotations of binding residues. The PDBBindv2020 dataset contains the splits used in section 3.7 of the paper (PDB IDs and chain IDs).
+
+For the Yu dataset, we extracted the corresponding structures from BioLip, which are provided in the archive `biolip_structures.zip`.
 <br>
 The structure files are organized in three folders :
 - `receptor` : Structure files extracted directly from the BioLip database and where the PDB ID and chain ID of the original sequence files match exactly.
@@ -43,7 +49,7 @@ To train and test the models please run `python scripts/train_model.py`.
 To generate our result tables, please run  `python scripts/create_result_tables.py`
 
 ## Models
-We trained two major architectures : Graph Convolutional Networks (GCN) and Graph Attention Networks (GAT) for all cutoff  distances 4, 6, 8 and 10 Angstroms. You can download our trained models [here](https://cunicz-my.sharepoint.com/:f:/g/personal/88889462_cuni_cz/EqFARaVLNctBn8kupuW26qkBgUew3qjhCo4HdDRXgvKyGQ?e=5v5lEn).
+We trained two major architectures : Graph Convolutional Networks (GCN) and Graph Attention Networks (GAT) for all cutoff  distances 4, 6, 8 and 10 Angstroms. You can download our trained models from the Zenodo link.
 
 ## Try a prediction by our GAT ensemble model
 To run a prediction using our GAT ensemble model (cutoffs : 4,6,8,10), please run the following commands:
