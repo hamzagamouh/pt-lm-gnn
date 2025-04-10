@@ -12,7 +12,7 @@ To run the scripts, please install the Conda environement by following these ste
 5. Install other pip requirements --> `pip install -r requirements.txt`
    
 ## Datasets
-All the datasets used are provided in the archive `datasets.zip` in the following Zenodo link https://doi.org/10.5281/zenodo.15184302 , which contains :
+All the datasets used are provided in the archive `datasets.zip` in the following [Zenodo link](https://doi.org/10.5281/zenodo.15184302) , which contains :
 - Yu dataset
 - DNA-RNA benchmark datasets
 - PDBBindv2020 curated dataset
@@ -49,7 +49,7 @@ To train and test the models please run `python scripts/train_model.py`.
 To generate our result tables, please run  `python scripts/create_result_tables.py`
 
 ## Models
-We trained two major architectures : Graph Convolutional Networks (GCN) and Graph Attention Networks (GAT) for all cutoff  distances 4, 6, 8 and 10 Angstroms. You can download our trained models from the paper Zenodo link https://doi.org/10.5281/zenodo.15184302.
+You can download all pretrained models used in the paper from the [Zenodo link](https://doi.org/10.5281/zenodo.15184302), specifically from the archive `models.zip`.
 
 ## Try a prediction by our GAT ensemble model
 To run a prediction using our GAT ensemble model (cutoffs : 4,6,8,10), please run the following commands:
